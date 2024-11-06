@@ -6,6 +6,7 @@ from sklearn.ensemble import RandomForestClassifier, HistGradientBoostingClassif
 import pandas as pd
 from sklearn.model_selection import GridSearchCV, KFold
 import joblib
+import plotly.graph_objects as go
 
 
 ### This code shows how to use KFold to do cross_validation.
@@ -15,19 +16,48 @@ bc = load_breast_cancer()
 X, y = bc.data, bc.target
 scores = []
 kf = KFold(n_splits=5) #
-# X = features ['humidity, 'outlook'], y = classifications ['play tennis' 'not play tennis']
-for train_index, test_index in kf.split(X) : # will give you an index for test and training data
-    X_train, X_test, y_train, y_test = \
-        (X[train_index], X[test_index], y[train_index], y[test_index])
-    # clf = tree.DecisionTreeClassifier()
-    clf = RandomForestClassifier(n_estimators=10, criterion='gini')
-    # do 10, 15, 20, etc
-    # also test with gini versus entropy
-    # run it 6 times all
-    clf.fit(X_train, y_train) # fitting a line or function to a set of data (train)
-    scores.append(clf.score(X_test, y_test)) # to get the accuracy
 
-print(scores) # Compute the average of all those values to get the Y
+x_axis = [10, 25, 50]
+y_axis_gini = []
+y_axis_entropy = []
+
+
+def run(n_estimators, criterion) :
+    scores = []
+    # X = features ['humidity, 'outlook'], y = classifications ['play tennis' 'not play tennis']
+    for train_index, test_index in kf.split(X):  # will give you an index for test and training data
+        X_train, X_test, y_train, y_test = \
+            (X[train_index], X[test_index], y[train_index], y[test_index])
+        # clf = tree.DecisionTreeClassifier()
+        clf = RandomForestClassifier(n_estimators=n_estimators, criterion=criterion)
+        # do 10, 15, 20, etc
+        # also test with gini versus entropy
+        # run it 6 times all
+        clf.fit(X_train, y_train)  # fitting a line or function to a set of data (train)
+        scores.append(clf.score(X_test, y_test))  # to get the accuracy
+
+    return sum(scores) / len(scores)
+
+# Test gini
+for x in x_axis :
+    y_axis_gini.append(run(x, 'gini'))
+    y_axis_entropy.append(run(x, 'entropy'))
+
+
+fig = go.Figure()
+
+fig.add_trace(go.Scatter(x=x_axis, y=y_axis_gini, mode='lines+markers', name='Gini Accuracy'))
+fig.add_trace(go.Scatter(x=x_axis, y=y_axis_entropy, mode='lines+markers', name='Entropy Accuracy'))
+
+fig.update_layout(
+    title="Random Forest Accuracy vs Number of Estimators",
+    xaxis_title="Number of Estimators",
+    yaxis_title="Accuracy",
+    template="plotly_dark"
+)
+
+fig.show()
+
 
 ## Part 2. This code (from https://scikit-learn.org/1.5/auto_examples/ensemble/plot_forest_hist_grad_boosting_comparison.html)
 ## shows how to use GridSearchCV to do a hyperparameter search to compare two techniques.
