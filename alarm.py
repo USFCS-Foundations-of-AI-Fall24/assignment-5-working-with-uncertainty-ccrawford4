@@ -56,3 +56,16 @@ print(alarm_infer.query(variables=["JohnCalls"],evidence={"Earthquake":"yes"}))
 q = alarm_infer.query(variables=["JohnCalls", "Earthquake"],evidence={"Burglary":"yes","MaryCalls":"yes"})
 print(q)
 
+def main():
+    # Additional queries
+    print("Probability of Mary calling given that John called:")
+    print(alarm_infer.query(variables=["MaryCalls"], evidence={"JohnCalls":"yes"}))
+    print("Probability of John and Mary Calling given Alarm: ")
+    print(alarm_infer.query(variables=["MaryCalls", "JohnCalls"], evidence={"Alarm":"yes"}))
+    print("The probability of Alarm, given that Mary called: ")
+    print(alarm_infer.query(variables=["Alarm"], evidence={"MaryCalls": "yes"}))
+
+
+if __name__ == '__main__':
+    main()
+
