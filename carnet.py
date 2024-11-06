@@ -7,7 +7,8 @@ car_model = BayesianNetwork(
         ("Battery", "Ignition"),
         ("Ignition","Starts"),
         ("Gas","Starts"),
-        ("Starts","Moves")
+        ("Starts","Moves"),
+        ("KeyPresent")
     ]
 )
 
@@ -59,6 +60,8 @@ cpd_moves = TabularCPD(
     state_names={"Moves": ["yes", "no"],
                  "Starts": ['yes', 'no'] }
 )
+
+# gas and ignition are going to be connected to KeyPresent
 
 
 # Associating the parameters with the model structure

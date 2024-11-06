@@ -38,15 +38,29 @@ class HMM:
         """reads HMM structure from transition (basename.trans),
         and emission (basename.emit) files,
         as well as the probabilities."""
+
+        # Take cat.emit and cat.emit
+        # and build this thing:
+        # {{happy: {silent: 0.2, mow:
+
+        # do one for both transmissions and emissions
         pass
 
 
    ## you do this.
     def generate(self, n):
+        # 'generate the hash state'
+
+        # random.choices()
         """return an n-length Sequence by randomly sampling from this HMM."""
+
+        # go through choice
         pass
 
     def forward(self, sequence):
+        # summing all the probablities
+        # transition probablity * emission probablity?
+
         pass
     ## you do this: Implement the Viterbi algorithm. Given a Sequence with a list of emissions,
     ## determine the most likely sequence of states.
