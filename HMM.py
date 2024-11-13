@@ -35,17 +35,25 @@ class HMM:
 
     ## part 1 - you do this.
     def load(self, basename):
-        """reads HMM structure from transition (basename.trans),
-        and emission (basename.emit) files,
-        as well as the probabilities."""
+        emit_file = open(f'{basename}.emit', 'r')
+        transmission_file = open(f'{basename}.trans', 'r')
 
-        # Take cat.emit and cat.emit
-        # and build this thing:
-        # {{happy: {silent: 0.2, mow:
+        emit_lines = emit_file.readlines()
+        for line in emit_lines :
+            parts = line.split()
+            key, child, score = parts[0], parts[1], float(parts[2])
+            if key not in self.emissions :
+                self.emissions[key] = {}
+            self.emissions[key][child] = score
 
-        # do one for both transmissions and emissions
-        pass
-
+        # Load Transmission
+        trans_lines = transmission_file.readlines()
+        for line in trans_lines :
+            parts = line.split()
+            key, child, score = parts[0], parts[1], float(parts[2])
+            if key not in self.transitions:
+                self.transitions[key] = {}
+            self.transitions[key][child] = score
 
    ## you do this.
     def generate(self, n):
@@ -77,6 +85,7 @@ class HMM:
 
 
 
-
-
-
+h = HMM()
+h.load('cat')
+print(h.transitions)
+print(h.emissions)
