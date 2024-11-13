@@ -8,7 +8,7 @@ car_model = BayesianNetwork(
         ("Ignition","Starts"),
         ("Gas","Starts"),
         ("Starts","Moves"),
-      #  ("KeyPresent")
+        ("KeyPresent", "Starts")
     ]
 )
 
@@ -46,10 +46,15 @@ cpd_ignition = TabularCPD(
 cpd_starts = TabularCPD(
     variable="Starts",
     variable_card=2,
-    values=[[0.95, 0.05, 0.05, 0.001], [0.05, 0.95, 0.95, 0.9999]],
-    evidence=["Ignition", "Gas"],
-    evidence_card=[2, 2],
-    state_names={"Starts":['yes','no'], "Ignition":["Works", "Doesn't work"], "Gas":['Full',"Empty"]},
+    values=[[0.99, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01], [0.01, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99]],
+    evidence=["Ignition", "Gas", "KeyPresent"],
+    evidence_card=[2, 2, 2],
+    state_names={
+        "Starts":['yes','no'],
+        "Ignition":["Works", "Doesn't work"],
+        "Gas":['Full',"Empty"],
+        "KeyPresent": ['yes', 'no']
+    },
 )
 
 cpd_moves = TabularCPD(
@@ -61,11 +66,18 @@ cpd_moves = TabularCPD(
                  "Starts": ['yes', 'no'] }
 )
 
+cpd_key_present = TabularCPD(
+    variable="KeyPresent",
+    variable_card=2,
+    values=[[0.1], [0.9]],
+    state_names={"KeyPresent": ["yes", "no"]},
+)
+
 # gas and ignition are going to be connected to KeyPresent
 
 
 # Associating the parameters with the model structure
-car_model.add_cpds( cpd_starts, cpd_ignition, cpd_gas, cpd_radio, cpd_battery, cpd_moves)
+car_model.add_cpds( cpd_starts, cpd_ignition, cpd_gas, cpd_radio, cpd_battery, cpd_moves, cpd_key_present)
 
 car_infer = VariableElimination(car_model)
 
@@ -94,6 +106,9 @@ def main():
 
     print("What is the probability that the car starts if the radio works and it has gas in it: ")
     print(car_infer.query(variables=["Starts"], evidence={"Radio": "turns on", "Gas": "Full"}))
+
+    print("What is the probability the key is not present if the car doesn't move")
+    print(car_infer.query(variables=["KeyPresent"], evidence={"Moves": "no"}))
 
 
 if __name__ == '__main__':
