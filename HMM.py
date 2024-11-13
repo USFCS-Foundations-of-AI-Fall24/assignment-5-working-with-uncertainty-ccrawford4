@@ -82,10 +82,3 @@ class HMM:
         pass
     ## You do this. Given a sequence with a list of emissions, fill in the most likely
     ## hidden states using the Viterbi algorithm.
-
-
-
-h = HMM()
-h.load('cat')
-print(h.transitions)
-print(h.emissions)
