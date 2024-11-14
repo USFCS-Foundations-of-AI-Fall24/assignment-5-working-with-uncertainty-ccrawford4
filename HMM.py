@@ -1,10 +1,11 @@
-
-
+import math
 import random
 import argparse
 import codecs
 import os
 import numpy
+from plotly.validators.histogram import cumulative
+
 
 # Sequence - represents a sequence of hidden states and corresponding
 # output variables.
@@ -57,13 +58,40 @@ class HMM:
 
    ## you do this.
     def generate(self, n):
-        # 'generate the hash state'
+        result = ""
 
-        # random.choices()
-        """return an n-length Sequence by randomly sampling from this HMM."""
+        def build_total(map) :
+            cumulative = []
+            total = 0
+            for state, score in map.items() :
+                total += score
+                cumulative.append({'state': state, 'score': score})
 
-        # go through choice
-        pass
+            return cumulative
+
+        def get_best_atribute(cumulative) :
+            r = random.random()
+            for j, threshold in enumerate(cumulative):
+                if r <= threshold['score']:
+                    return threshold['state']
+            return cumulative[0]['state']
+
+        states = self.transitions['#']
+        # Your loop, but simplified
+        for i in range(n):
+            # Keep track of total
+            cumulative = build_total(states)
+            best_transmission = get_best_atribute(cumulative)
+
+            emissions = self.emissions[best_transmission]
+            emissions_cumulative = build_total(emissions)
+            best_emission = get_best_atribute(emissions_cumulative)
+
+            result += best_transmission + " " + best_emission + " "
+            states = self.transitions[best_transmission]
+
+
+        return result
 
     def forward(self, sequence):
         # summing all the probablities
@@ -82,3 +110,19 @@ class HMM:
         pass
     ## You do this. Given a sequence with a list of emissions, fill in the most likely
     ## hidden states using the Viterbi algorithm.
+
+
+def main() :
+    # Do work to
+    arg = 'cat'
+    n = 20
+
+    hmm = HMM()
+    hmm.load(arg)
+    print(hmm.generate(n))
+
+
+
+
+if __name__ == '__main__':
+    main()
