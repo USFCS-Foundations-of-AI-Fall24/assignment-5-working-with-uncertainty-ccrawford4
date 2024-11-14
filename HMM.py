@@ -3,6 +3,8 @@ import random
 import argparse
 import codecs
 import os
+import sys
+
 import numpy
 from plotly.validators.histogram import cumulative
 
@@ -101,11 +103,6 @@ class HMM:
     ## you do this: Implement the Viterbi algorithm. Given a Sequence with a list of emissions,
     ## determine the most likely sequence of states.
 
-
-
-
-
-
     def viterbi(self, sequence):
         pass
     ## You do this. Given a sequence with a list of emissions, fill in the most likely
@@ -113,15 +110,10 @@ class HMM:
 
 
 def main() :
-    # Do work to
-    arg = 'cat'
-    n = 20
-
+    file, gen_flag, amount = sys.argv[1], sys.argv[2], int(sys.argv[3])
     hmm = HMM()
-    hmm.load(arg)
-    print(hmm.generate(n))
-
-
+    hmm.load(file)
+    print(hmm.generate(amount))
 
 
 if __name__ == '__main__':
