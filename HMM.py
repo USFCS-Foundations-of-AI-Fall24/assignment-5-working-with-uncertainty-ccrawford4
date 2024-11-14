@@ -72,10 +72,12 @@ class HMM:
             return cumulative
 
         def get_best_atribute(cumulative) :
+            random.shuffle(cumulative)
             r = random.random()
             for j, threshold in enumerate(cumulative):
                 if r <= threshold['score']:
                     return threshold['state']
+
             return cumulative[0]['state']
 
         states = self.transitions['#']
@@ -89,7 +91,7 @@ class HMM:
             emissions_cumulative = build_total(emissions)
             best_emission = get_best_atribute(emissions_cumulative)
 
-            result += best_transmission + " " + best_emission + " "
+            result += best_transmission + " " + best_emission + "\n"
             states = self.transitions[best_transmission]
 
 
@@ -98,6 +100,14 @@ class HMM:
     def forward(self, sequence):
         # summing all the probablities
         # transition probablity * emission probablity?
+        probabilites = []
+        file = open(f'{sequence}_.obs', 'r')
+        lines = file.readlines()
+        for line in lines :
+            parts = line.split()
+            transmissionsk
+            total += float(self.transitions[transmission])
+
 
         pass
     ## you do this: Implement the Viterbi algorithm. Given a Sequence with a list of emissions,
