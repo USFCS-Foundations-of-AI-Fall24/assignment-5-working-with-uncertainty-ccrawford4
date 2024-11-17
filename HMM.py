@@ -116,9 +116,43 @@ class HMM:
     ## you do this: Implement the Viterbi algorithm. Given a Sequence with a list of emissions,
     ## determine the most likely sequence of states.
     def viterbi(self, sequence):
-        pass
+        O = list(set(sequence.outputseq))
+        t = len(O)
+        states = sequence.stateseq
+        T = self.transitions
+        E = self.emissions
+
+        M = {time: {state: 0 for state in states} for time in range(1, t + 1)}
+        Backpointers = {time: {state: None for state in states} for time in range(1, t + 1)}
+
+        # Step one: Initialize for the first observation
+        for s in states:
+            M[1][s] = (T[states[0]].get(s, 0.0) * E[s].get(O[0], 0.0))
+            Backpointers[1][s] = None  # No previous state at time step 1
+
+        # Step two: Dynamic programming for time steps 2 to t
+        for i in range(2, t + 1):
+            for s in states:
+                # Calculate the maximum probability and backpointer
+                max_prob, best_prev_state = max(
+                    ((M[i - 1][s2] * T[s2].get(s, 0.0) * E[s].get(O[i - 1], 0.0), s2)
+                     for s2 in states),
+                    key=lambda x: x[0]
+                )
+                M[i][s] = max_prob
+                Backpointers[i][s] = best_prev_state
+
+        final_state = max(M[t], key=M[t].get)
+        best_path = [final_state]
+
+        # Backtrack
+        for i in range(t, 1, -1):
+            best_path.insert(0, Backpointers[i][best_path[0]])
+
+        return best_path
     ## You do this. Given a sequence with a list of emissions, fill in the most likely
     ## hidden states using the Viterbi algorithm.
+
 
 
 def main() :
@@ -146,6 +180,24 @@ def main() :
 
         seq = Sequence(states, outputs)
         print(hmm.forward(seq))
+
+    elif flag == '--viterbi':
+        dest_file_name = sys.argv[3]
+        dest_file = open(f'{dest_file_name}', 'w')
+        dest_file.write(hmm.generate(20))
+        dest_file.close()
+        with open(dest_file_name, 'r') as f:
+            lines = f.readlines()
+
+        states = []
+        outputs = []
+        for line in lines:
+            state, output = line.strip().split()
+            states.append(state)
+            outputs.append(output)
+
+        seq = Sequence(states, outputs)
+        print(hmm.viterbi(seq))
 
 if __name__ == '__main__':
     main()
