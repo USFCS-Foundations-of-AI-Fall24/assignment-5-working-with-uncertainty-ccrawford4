@@ -93,26 +93,28 @@ class HMM:
 
             result += best_transmission + " " + best_emission + "\n"
             states = self.transitions[best_transmission]
-
-
         return result
 
     def forward(self, sequence):
         # summing all the probablities
         # transition probablity * emission probablity?
-        probabilites = []
-        file = open(f'{sequence}_.obs', 'r')
-        lines = file.readlines()
-        for line in lines :
-            parts = line.split()
-            transmissionsk
-            total += float(self.transitions[transmission])
+        O = list(set(sequence.outputseq))
+        t = len(O)
+        M = {time: {state: 0 for state in sequence.stateseq} for time in range(1, t + 1)}
 
+        for s in sequence.stateseq:
+            M[1][s] = (self.transitions[sequence.stateseq[0]][s] if s in self.transitions[sequence.stateseq[0]] else 0.0) * (self.emissions[s][O[0]] if O[0] in self.emissions[s] else 0.0)
 
-        pass
+        for i in range(2, t + 1):
+            for s in sequence.stateseq:
+                M[i][s] = sum(
+                    M[i - 1][s2] * (self.transitions[s2][s] if s in self.transitions[s2] else 0.0) * (self.emissions[s][O[i - 1]] if O[i - 1] in self.emissions[s] else 0.0)
+                    for s2 in sequence.stateseq
+                )
+        return M
+
     ## you do this: Implement the Viterbi algorithm. Given a Sequence with a list of emissions,
     ## determine the most likely sequence of states.
-
     def viterbi(self, sequence):
         pass
     ## You do this. Given a sequence with a list of emissions, fill in the most likely
@@ -120,11 +122,30 @@ class HMM:
 
 
 def main() :
-    file, gen_flag, amount = sys.argv[1], sys.argv[2], int(sys.argv[3])
+    file, flag, amount = sys.argv[1], sys.argv[2], sys.argv[3]
     hmm = HMM()
     hmm.load(file)
-    print(hmm.generate(amount))
 
+
+    if flag == '--generate' :
+        print(hmm.generate(int(amount)))
+    elif flag == '--forward':
+        dest_file_name = sys.argv[3]
+        dest_file = open(f'{dest_file_name}', 'w')
+        dest_file.write(hmm.generate(20))
+        dest_file.close()
+        with open(dest_file_name, 'r') as f:
+            lines = f.readlines()
+
+        states = []
+        outputs = []
+        for line in lines:
+            state, output = line.strip().split()
+            states.append(state)
+            outputs.append(output)
+
+        seq = Sequence(states, outputs)
+        print(hmm.forward(seq))
 
 if __name__ == '__main__':
     main()
