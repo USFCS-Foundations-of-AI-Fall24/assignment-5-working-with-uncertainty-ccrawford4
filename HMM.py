@@ -153,8 +153,6 @@ class HMM:
     ## You do this. Given a sequence with a list of emissions, fill in the most likely
     ## hidden states using the Viterbi algorithm.
 
-
-
 def main() :
     file, flag, amount = sys.argv[1], sys.argv[2], sys.argv[3]
     hmm = HMM()
